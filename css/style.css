@@ -1,0 +1,486 @@
+/* ========================================
+    RESET E CONFIGURAÇÕES GLOBAIS
+======================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Cores principais */
+    --bg-primary: #f0f0f0;
+    --bg-secondary: #dfdfdf;
+    --text-primary: #0f0f0f;
+    --text-secondary: #888;
+    --gradient-dark: linear-gradient(315deg, #505050 0%, #0f0f0f 100%);
+    --gradient-button: linear-gradient(135deg, #505050 0%, #0f0f0f 100%);
+    --accent-color: #0072ff;
+    --accent-color-hover: #0072cc;
+    
+    /* Fontes */
+    --font-primary: 'Montserrat', sans-serif;
+    --font-logo: 'Redressed', cursive;
+    
+    /* Espaçamentos */
+    --spacing-xs: 8px;
+    --spacing-sm: 15px;
+    --spacing-md: 20px;
+    --spacing-lg: 30px;
+    
+    /* Bordas */
+    --border-radius-sm: 25px;
+    --border-radius-lg: 50px;
+}
+
+body {
+    background-color: var(--bg-primary);
+    font-family: var(--font-primary);
+    min-height: 100vh;
+}
+
+/* ========================================
+    SEÇÃO PRINCIPAL - INDEX
+======================================== */
+.index-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: var(--spacing-md);
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Cabeçalho do Index */
+.header-section {
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.logo {
+    font-family: var(--font-logo);
+    font-size: 7rem;
+    font-weight: 400;
+    background: var(--gradient-dark);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+    line-height: 1;
+}
+
+.subtitle {
+    font-family: var(--font-primary);
+    font-size: 18px;
+    color: var(--text-primary);
+    line-height: 1.5;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Input Section */
+.input-section {
+    width: 100%;
+}
+
+.input-container {
+    display: flex;
+    align-items: center;
+    background-color: var(--bg-secondary);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-xs);
+    width: 100%;
+}
+
+.search-icon {
+    background: var(--gradient-dark);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: var(--spacing-sm);
+    flex-shrink: 0;
+}
+
+.search-icon i {
+    color: var(--bg-primary);
+    font-size: 20px;
+}
+
+.text-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: var(--font-primary);
+    font-size: 16px;
+    color: var(--text-primary);
+    font-weight: 400;
+    padding: 10px 0;
+    min-width: 0;
+}
+
+.text-input::placeholder {
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.access-button {
+    background: var(--gradient-button);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    padding: 15px 30px;
+    color: var(--bg-primary);
+    font-family: var(--font-primary);
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.access-button:hover {
+    transform: scale(1.05);
+}
+
+.access-button:active {
+    transform: scale(0.98);
+}
+
+.access-button-icon {
+    display: none;
+}
+
+/* Footer */
+.footer {
+    position: fixed;
+    bottom: var(--spacing-sm);
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: var(--text-secondary);
+    font-family: var(--font-primary);
+    font-size: 14px;
+    background-color: var(--bg-primary);
+    padding: var(--spacing-sm) 0;
+    z-index: 1000;
+}
+
+/* ========================================
+    SEÇÃO EDITOR - DRAION
+======================================== */
+.editor-section {
+    display: none;
+    min-height: 100vh;
+    padding: var(--spacing-md);
+}
+
+.notepad-container {
+    width: 100%;
+    max-width: 800px;
+    min-height: calc(100vh - 40px);
+    position: relative;
+    margin: 0 auto;
+}
+
+.editor {
+    width: 100%;
+    min-height: calc(100vh - 40px);
+    border: none;
+    outline: none;
+    padding: var(--spacing-lg);
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--text-primary);
+    background: transparent;
+    resize: none;
+    font-family: var(--font-primary);
+    overflow-y: auto;
+    white-space: pre-wrap;
+    position: relative;
+    z-index: 1;
+}
+
+.editor:focus {
+    outline: none;
+}
+
+/* Estilos de formatação do editor */
+.editor b, .editor strong {
+    font-weight: bold;
+}
+
+.editor i, .editor em {
+    font-style: italic;
+}
+
+.editor u {
+    text-decoration: underline;
+}
+
+.editor .strikethrough {
+    text-decoration: line-through;
+}
+
+.editor input[type="checkbox"] {
+    accent-color: var(--accent-color);
+    cursor: pointer;
+    vertical-align: baseline;
+}
+
+/* Placeholder personalizado */
+.editor:empty:before {
+    content: "Comece a escrever suas notas aqui...";
+    color: var(--text-secondary);
+    font-style: italic;
+    pointer-events: none;
+    position: absolute;
+}
+
+/* Links no editor */
+.editor a {
+    color: var(--accent-color-hover);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.editor a:hover {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+/* Linha divisória */
+.divider-line {
+    display: block;
+    width: 100%;
+    height: 1px;
+    background-color: #c0c0c0;
+    border: none;
+    margin: 10px 0;
+    user-select: none;
+}
+
+/* Preview overlay */
+.preview-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: calc(100vh - 40px);
+    padding: var(--spacing-lg);
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--text-primary);
+    font-family: var(--font-primary);
+    pointer-events: none;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    z-index: 2;
+}
+
+.preview-overlay a {
+    pointer-events: auto;
+    color: var(--accent-color-hover);
+    text-decoration: none;
+}
+
+.preview-overlay a:hover {
+    color: var(--accent-color);
+}
+
+.preview-overlay input[type="checkbox"] {
+    pointer-events: auto;
+    vertical-align: baseline;
+}
+
+/* ========================================
+    BOTÃO FLUTUANTE (HELP)
+======================================== */
+.floating-button {
+    position: fixed;
+    bottom: var(--spacing-lg);
+    right: var(--spacing-lg);
+    width: 50px;
+    height: 50px;
+    background: var(--gradient-button);
+    border: none;
+    border-radius: 50%;
+    color: var(--bg-primary);
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.floating-button:hover {
+    transform: scale(1.1);
+}
+
+.floating-button:active {
+    transform: scale(0.95);
+}
+
+/* ========================================
+    SCROLLBAR PERSONALIZADA
+======================================== */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--text-primary);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #202020;
+}
+
+/* ========================================
+    RESPONSIVIDADE
+======================================== */
+
+/* Tablets */
+@media (max-width: 768px) {
+    .logo {
+        font-size: 6rem;
+    }
+    
+    .subtitle {
+        font-size: 16px;
+    }
+    
+    .access-button {
+        padding: 15px 25px;
+        font-size: 16px;
+    }
+
+    .editor, .preview-overlay {
+        padding: var(--spacing-md);
+        min-height: calc(100vh - 20px);
+    }
+
+    .floating-button {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+        bottom: var(--spacing-md);
+        right: var(--spacing-md);
+    }
+}
+
+/* Smartphones */
+@media (max-width: 600px) {
+    .index-section {
+        padding: var(--spacing-sm);
+    }
+    
+    .subtitle {
+        font-size: 14px;
+    }
+    
+    .input-container {
+        padding: 6px;
+    }
+    
+    .search-icon {
+        width: 45px;
+        height: 45px;
+        margin-right: 12px;
+    }
+    
+    .search-icon i {
+        font-size: 18px;
+    }
+    
+    .text-input {
+        font-size: 14px;
+    }
+    
+    .access-button {
+        padding: 15px 20px;
+        font-size: 14px;
+    }
+
+    .editor-section {
+        padding: 10px;
+    }
+}
+
+/* Smartphones pequenos */
+@media (max-width: 480px) {
+    .logo {
+        font-size: 5rem;
+    }
+    
+    .search-icon {
+        display: none;
+    }
+    
+    .text-input {
+        flex: 1;
+        padding: 10px 15px;
+    }
+    
+    .access-button {
+        padding: 15px;
+        min-width: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .access-button-text {
+        display: none;
+    }
+    
+    .access-button-icon {
+        display: block;
+        font-size: 18px;
+    }
+}
+
+/* Telas muito pequenas */
+@media (max-width: 320px) {
+    .logo {
+        font-size: 3.5rem;
+    }
+    
+    .subtitle {
+        font-size: 12px;
+    }
+    .text-input {
+        font-size: 13px;
+    }
+}
+
+/* ========================================
+    CLASSES UTILITÁRIAS
+======================================== */
+.hidden {
+    display: none !important;
+}
+
+.visible {
+    display: block !important;
+}

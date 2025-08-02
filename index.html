@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draion</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Redressed&display=swap" rel="stylesheet">
+    
+    <!-- Remix Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.0.0/fonts/remixicon.css" rel="stylesheet">
+    
+    <!-- CSS Principal -->
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <!-- ========================================
+         SEÇÃO INDEX - PÁGINA INICIAL
+    ======================================== -->
+    <section id="indexSection" class="index-section">
+        <div class="container">
+            <!-- Cabeçalho -->
+            <header class="header-section">
+                <h1 class="logo">Draion</h1>
+                <p class="subtitle">
+                    Suas anotações, seus projetos, sua equipe.<br>
+                    Tudo organizado, sincronizado e sempre acessível.
+                </p>
+            </header>
+            
+            <!-- Seção de input -->
+            <main class="input-section">
+                <div class="input-container">
+                    <!-- Ícone de busca -->
+                    <div class="search-icon" aria-hidden="true">
+                        <i class="ri-search-line"></i>
+                    </div>
+                    
+                    <!-- Campo de entrada -->
+                    <input 
+                        type="text" 
+                        id="pageNameInput"
+                        class="text-input" 
+                        placeholder="Digite o nome da sua página..."
+                        aria-label="Campo de busca para nome da página"
+                    >
+                    
+                    <!-- Botão de acesso -->
+                    <button id="accessButton" class="access-button" type="button">
+                        <span class="access-button-text">Acessar</span>
+                        <i class="access-button-icon ri-search-line"></i>
+                    </button>
+                </div>
+            </main>
+        </div>
+
+        <!-- ========================================
+            FOOTER FIXO
+        ======================================== -->
+        <footer class="footer">
+            <p>&copy; Draion - Todos os direitos reservados</p>
+        </footer>
+    </section>
+
+    <!-- ========================================
+         SEÇÃO EDITOR - DRAION NOTEPAD
+    ======================================== -->
+    <section id="editorSection" class="editor-section">
+        <div class="notepad-container">
+            <!-- Editor de texto -->
+            <div id="editor" class="editor" contenteditable="true"></div>
+            
+            <!-- Preview overlay -->
+            <div id="preview" class="preview-overlay"></div>
+        </div>
+        
+        <!-- Botão flutuante do editor -->
+        <!-- <button id="floatingButton" class="floating-button" aria-label="Ajuda">
+            ?
+        </button> -->
+    </section>
+
+    <!-- Firebase Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-database-compat.min.js"></script>
+
+    <!-- Script principal da aplicação -->
+    <script type="module" src="./js/main.js"></script>
+</body>
+</html>
