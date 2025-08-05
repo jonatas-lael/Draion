@@ -1,4 +1,4 @@
-// ui.js - Gerenciamento da interface do usuário
+// ui.js - Gerenciamento da interface do usuário (Versão Colaborativa)
 
 import { dbManager } from './database.js';
 import { updatePreview } from './editor/preview.js';
@@ -12,6 +12,12 @@ class UIManager {
         this.isInitialized = false;
         this.saveTimeout = null;
         this.checkboxSaveTimeout = null;
+        
+        // Controle de colaboração
+        this.isReceivingRemoteUpdate = false;
+        this.lastLocalContent = '';
+        this.collaborativeUpdateTimeout = null;
+        this.lastCursorPosition = null;
     }
 
     init() {
@@ -40,7 +46,7 @@ class UIManager {
             clearTimeout(this.checkboxSaveTimeout);
             this.checkboxSaveTimeout = setTimeout(() => {
                 this.saveContent();
-            }, 500); // 500ms para checkboxes vs 2000ms para texto
+            }, 300); // Ainda mais rápido para colaboração
         });
     }
 
@@ -75,16 +81,20 @@ class UIManager {
             
             // Carregar conteúdo se fornecido
             if (pageData && pageData.content) {
+                this.isReceivingRemoteUpdate = true; // Evitar loop
                 this.editor.innerHTML = pageData.content;
+                this.lastLocalContent = this.getContentWithCheckboxStates();
                 
                 // Configurar listeners para checkboxes existentes
                 setTimeout(() => {
                     setupExistingCheckboxes();
+                    this.isReceivingRemoteUpdate = false;
                 }, 100);
                 
                 updatePreview();
             } else {
                 this.editor.innerHTML = '';
+                this.lastLocalContent = '';
             }
 
             // Fade-in do editor
@@ -99,8 +109,8 @@ class UIManager {
                 this.setCursorToEnd();
             }, 50);
 
-            // Configurar auto-save
-            this.setupAutoSave();
+            // Configurar auto-save colaborativo
+            this.setupCollaborativeAutoSave();
             
             // Escutar mudanças em tempo real
             this.setupRealtimeListener();
@@ -145,32 +155,97 @@ class UIManager {
         }
     }
 
-    // Configurar salvamento automático
-    setupAutoSave() {
+    // Salvar posição do cursor
+    saveCursorPosition() {
+        try {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                this.lastCursorPosition = {
+                    startContainer: range.startContainer,
+                    startOffset: range.startOffset,
+                    endContainer: range.endContainer,
+                    endOffset: range.endOffset
+                };
+            }
+        } catch (error) {
+            console.error('Erro ao salvar posição do cursor:', error);
+            this.lastCursorPosition = null;
+        }
+    }
+
+    // Restaurar posição do cursor
+    restoreCursorPosition() {
+        try {
+            if (!this.lastCursorPosition) return false;
+
+            const selection = window.getSelection();
+            const range = document.createRange();
+            
+            // Verificar se os containers ainda existem no DOM
+            if (!document.contains(this.lastCursorPosition.startContainer) ||
+                !document.contains(this.lastCursorPosition.endContainer)) {
+                return false;
+            }
+
+            range.setStart(this.lastCursorPosition.startContainer, this.lastCursorPosition.startOffset);
+            range.setEnd(this.lastCursorPosition.endContainer, this.lastCursorPosition.endOffset);
+            
+            selection.removeAllRanges();
+            selection.addRange(range);
+            
+            return true;
+        } catch (error) {
+            console.error('Erro ao restaurar posição do cursor:', error);
+            return false;
+        }
+    }
+
+    // Configurar salvamento automático colaborativo (mais agressivo)
+    setupCollaborativeAutoSave() {
         // Remover listeners anteriores se existirem
-        this.editor.removeEventListener('input', this.handleAutoSave);
+        this.editor.removeEventListener('input', this.handleCollaborativeAutoSave);
         
-        // Adicionar novo listener
-        this.handleAutoSave = () => {
-            // Debounce: salvar após 2 segundos de inatividade
+        // Listener mais agressivo para colaboração
+        this.handleCollaborativeAutoSave = () => {
+            if (this.isReceivingRemoteUpdate) return; // Não salvar durante atualizações remotas
+            
+            // Salvar posição do cursor
+            this.saveCursorPosition();
+            
+            // Auto-save mais rápido para colaboração
             clearTimeout(this.saveTimeout);
             this.saveTimeout = setTimeout(() => {
                 this.saveContent();
-            }, 2000);
+            }, 800); // 800ms ao invés de 2000ms
         };
 
-        this.editor.addEventListener('input', this.handleAutoSave);
+        this.editor.addEventListener('input', this.handleCollaborativeAutoSave);
+
+        // Listener adicional para mudanças de cursor/seleção
+        this.editor.addEventListener('selectionchange', () => {
+            if (!this.isReceivingRemoteUpdate) {
+                this.saveCursorPosition();
+            }
+        });
     }
 
     // Salvar conteúdo no Firebase (incluindo estado dos checkboxes)
     async saveContent() {
         try {
+            if (this.isReceivingRemoteUpdate) return; // Não salvar durante atualizações remotas
+            
             // Capturar o HTML atual com o estado dos checkboxes
             const content = this.getContentWithCheckboxStates();
-            await dbManager.savePageContent(content);
-            console.log('Conteúdo auto-salvo (incluindo estado dos checkboxes)');
+            
+            // Só salvar se houve mudança real
+            if (content !== this.lastLocalContent) {
+                await dbManager.savePageContent(content);
+                this.lastLocalContent = content;
+                console.log('Conteúdo colaborativo salvo');
+            }
         } catch (error) {
-            console.error('Erro no auto-save:', error);
+            console.error('Erro no auto-save colaborativo:', error);
         }
     }
 
@@ -197,38 +272,49 @@ class UIManager {
         return tempDiv.innerHTML;
     }
 
-    // Configurar listener para mudanças em tempo real
+    // Configurar listener para mudanças em tempo real (colaborativo)
     setupRealtimeListener() {
         dbManager.listenToPageChanges((pageData) => {
-            // Atualizar conteúdo apenas se for diferente do atual
-            const currentContent = this.getContentWithCheckboxStates();
-            if (pageData.content && pageData.content !== currentContent) {
-                // Preservar posição do cursor se possível
-                const selection = window.getSelection();
-                const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+            // Evitar loops infinitos
+            if (this.isReceivingRemoteUpdate) return;
+            
+            const remoteContent = pageData.content || '';
+            const currentLocalContent = this.getContentWithCheckboxStates();
+            
+            // Só atualizar se o conteúdo remoto é diferente do local
+            if (remoteContent !== currentLocalContent && remoteContent !== this.lastLocalContent) {
+                console.log('Recebendo atualização colaborativa...');
                 
-                this.editor.innerHTML = pageData.content;
+                this.isReceivingRemoteUpdate = true;
                 
-                // Configurar listeners para checkboxes após atualizar conteúdo
+                // Salvar posição do cursor antes da atualização
+                this.saveCursorPosition();
+                
+                // Atualizar conteúdo
+                this.editor.innerHTML = remoteContent;
+                
+                // Configurar listeners para checkboxes
                 setTimeout(() => {
                     setupExistingCheckboxes();
-                }, 100);
+                }, 50);
                 
+                // Atualizar preview
                 updatePreview();
                 
                 // Tentar restaurar posição do cursor
-                if (range) {
-                    try {
-                        selection.removeAllRanges();
-                        selection.addRange(range);
-                    } catch (e) {
-                        // Se não conseguir restaurar, posicionar no final
-                        this.setCursorToEnd();
+                setTimeout(() => {
+                    const restored = this.restoreCursorPosition();
+                    if (!restored) {
+                        // Se não conseguiu restaurar, manter foco no editor
+                        this.editor.focus();
                     }
-                } else {
-                    // Se não havia seleção anterior, posicionar no final
-                    this.setCursorToEnd();
-                }
+                    
+                    // Atualizar controle local
+                    this.lastLocalContent = remoteContent;
+                    this.isReceivingRemoteUpdate = false;
+                    
+                    console.log('Atualização colaborativa aplicada');
+                }, 100);
             }
         });
     }
@@ -252,8 +338,12 @@ class UIManager {
             clearTimeout(this.checkboxSaveTimeout);
         }
         
-        if (this.editor && this.handleAutoSave) {
-            this.editor.removeEventListener('input', this.handleAutoSave);
+        if (this.collaborativeUpdateTimeout) {
+            clearTimeout(this.collaborativeUpdateTimeout);
+        }
+        
+        if (this.editor && this.handleCollaborativeAutoSave) {
+            this.editor.removeEventListener('input', this.handleCollaborativeAutoSave);
         }
         
         dbManager.stopListening();
